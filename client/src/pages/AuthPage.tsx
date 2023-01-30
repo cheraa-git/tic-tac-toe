@@ -2,9 +2,10 @@ import { FC, FormEvent, useEffect, useRef } from "react"
 import { Button } from "@mui/material"
 import { RootState, useAppDispatch, useAppSelector } from "../store/store"
 import { connect } from "../store/actions/appActions"
+import { Loader } from "../components/Loader/Loader"
 
 export const AuthPage: FC = () => {
-  const { errorMessage } = useAppSelector((state: RootState) => state.app)
+  const { errorMessage, loading } = useAppSelector((state: RootState) => state.app)
   const dispatch = useAppDispatch()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -32,7 +33,7 @@ export const AuthPage: FC = () => {
         </form>
       </div>
       <div className="absolute bottom-5 right-10">
-        <Button onClick={() => singInHandler()}>Sign in</Button>
+        {loading ? <Loader/>: <Button onClick={() => singInHandler()}>Sign in</Button>}
       </div>
     </div>
   )

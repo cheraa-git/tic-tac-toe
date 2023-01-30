@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { BoardData, GameResult, StartGameData, UserShape } from "../../../../common/common_types"
+import { gameEvents } from "../actions/gameActions"
 
 export interface GameSlice {
   opponentName: string
@@ -11,7 +12,7 @@ export interface GameSlice {
   resultGame: GameResult | null
   gamesHistory: { opponent: string, result: GameResult }[]
   infoMessage: string
-
+  gameLoading: boolean
 }
 
 const initialState: GameSlice = {
@@ -27,7 +28,8 @@ const initialState: GameSlice = {
   roomName: '',
   resultGame: null,
   gamesHistory: [],
-  infoMessage: ''
+  infoMessage: '',
+  gameLoading: false
 }
 
 export const gameSlice = createSlice({
@@ -64,6 +66,9 @@ export const gameSlice = createSlice({
     },
     setInfoMessage: (state, { payload }: PayloadAction<string>) => {
       state.infoMessage = payload
+    },
+    setGameLoading: (state, {payload}: PayloadAction<boolean>) => {
+      state.gameLoading = payload
     }
   }
 })
@@ -75,7 +80,9 @@ export const {
   setResultGame,
   toggleMove,
   clearGameState,
-  setInfoMessage
+  setInfoMessage,
+  setGameLoading,
+
 } = gameSlice.actions
 
 export default gameSlice.reducer

@@ -50,7 +50,7 @@ io.on('connection', (socket) => {
     });
     socket.on('send_invite', (name) => {
         const invitedUser = (0, utils_1.getOnlineUsers)(io)[name];
-        if (invitedUser.data.status === 'playing') {
+        if (invitedUser && invitedUser.data.status === 'playing') {
             return socket.emit('user_is_playing', invitedUser.data.name);
         }
         if (socket.data.name && invitedUser) {
@@ -78,7 +78,9 @@ io.on('connection', (socket) => {
                 moveAvailable: !moveAvailable
             };
             socket.data.status = 'playing';
+            socket.data.roomName = roomName;
             invitingUser.data.status = 'playing';
+            invitingUser.data.roomName = roomName;
             socket.join(roomName);
             invitingUser.join(roomName);
             socket.emit('start_game', invitedUserData);
@@ -87,13 +89,15 @@ io.on('connection', (socket) => {
     });
     socket.on('do_move', ({ boardData, shape, roomName }) => {
         const result = (0, utils_1.checkWin)(boardData, shape);
-        if (result.status === "win" && result.payload) {
-            boardData = (0, utils_1.setWinBoardData)(boardData, result.payload);
+        if (result.status === "win" || result.status === 'draw') {
             io.to(roomName).fetchSockets().then(players => {
                 players.forEach(player => {
                     player.data.status = 'waiting';
                 });
             });
+            if (result.payload) {
+                boardData = (0, utils_1.setWinBoardData)(boardData, result.payload);
+            }
         }
         const moveData = {
             boardData,
@@ -105,6 +109,12 @@ io.on('connection', (socket) => {
         }
     });
     socket.on('disconnect', () => {
+        const roomName = socket.data.roomName + '';
+        io.in(roomName).emit('opponent_disconnected', socket.data.name + '');
+        io.in(roomName).fetchSockets().then(players => {
+            players.forEach(player => player.data.status = "waiting");
+        });
+        console.log('ROOMS', socket.data.roomName);
         socket.data.name = '';
         socket.data.status = undefined;
         socket.broadcast.emit('users_online', Object.keys((0, utils_1.getOnlineUsers)(io)));

@@ -6,7 +6,7 @@ export interface AppSlice {
   onlineUsers: string[]
   currentUser: string
   errorMessage: string
-
+  loading: boolean
 }
 
 const initialState: AppSlice = {
@@ -14,6 +14,7 @@ const initialState: AppSlice = {
   onlineUsers: [],
   currentUser: '',
   errorMessage: '',
+  loading: false
 }
 
 export const appSlice = createSlice({
@@ -35,10 +36,12 @@ export const appSlice = createSlice({
     setError: (state, { payload: error }: PayloadAction<string>) => {
       state.errorMessage = error
     },
-
+    setLoading: (state, {payload}: PayloadAction<boolean>) => {
+      state.loading = payload
+    }
   }
 })
 
-export const { setSocket, setOnlineUsers, clearAppState, setCurrentUser, setError } = appSlice.actions
+export const { setSocket, setOnlineUsers, clearAppState, setCurrentUser, setError, setLoading } = appSlice.actions
 
 export default appSlice.reducer

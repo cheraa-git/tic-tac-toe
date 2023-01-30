@@ -46,7 +46,7 @@ export const MainPage: FC = () => {
         </div>
       </Dialog>
       <Dialog open={!!infoMessage} onClose={closeInfoMessage}>
-        <h1 className="text-xl p-5">{infoMessage}</h1>
+        <h1 className="normal-case text-xl p-5">{infoMessage}</h1>
         <Button onClick={closeInfoMessage} color="inherit">Close</Button>
       </Dialog>
     </div>

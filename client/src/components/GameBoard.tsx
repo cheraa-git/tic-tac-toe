@@ -5,6 +5,7 @@ import { BoardData, BoardRow } from "../../../common/common_types"
 import { doMove, sendInvite } from "../store/actions/gameActions"
 import { ResultGameText } from "./ResultGameText"
 import { Button } from "@mui/material"
+import { Ellipsis } from "./Loader/Ellipsis"
 
 export const GameBoard: FC = () => {
   const dispatch = useAppDispatch()
@@ -14,6 +15,7 @@ export const GameBoard: FC = () => {
     opponentName,
     moveAvailable,
     resultGame,
+    gameLoading
   } = useAppSelector((state: RootState) => state.game)
   const { currentUser } = useAppSelector((state: RootState) => state.app)
 
@@ -32,14 +34,17 @@ export const GameBoard: FC = () => {
     <div className="my-5 w-[300px] mx-auto">
       <div className="text-xl text-center bg-green-200 rounded-lg mb-1 capitalize">
         <p className="font-bold">{currentUser} VS {opponentName}</p>
-        {
-          resultGame
-            ? <div className="flex justify-evenly">
-              <ResultGameText result={resultGame}/>
-              <Button onClick={() => dispatch(sendInvite(opponentName))}>Revenge</Button>
-            </div>
-            : <p>{moveAvailable ? 'Your move' : `${opponentName} move`}</p>
-        }
+        <div className="flex justify-center">
+          {
+            resultGame
+              ? <div className="flex justify-evenly">
+                <ResultGameText result={resultGame}/>
+                <Button onClick={() => dispatch(sendInvite(opponentName))}>Revenge</Button>
+              </div>
+              : <p>{moveAvailable ? 'Your move' : `${opponentName} move`}</p>
+          }
+          {gameLoading && <div className="mt-auto mb-2 ml-5"><Ellipsis/></div>}
+        </div>
 
       </div>
       <div className="grid grid-cols-3 bg-sky-200 rounded mx-auto shadow-2xl relative">

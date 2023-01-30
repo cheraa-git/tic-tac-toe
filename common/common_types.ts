@@ -13,12 +13,14 @@ export interface ServerToClientEvents {
   start_game: (gameData: StartGameData) => void
   move: (payload: { boardData: BoardData, result: MoveResult }) => void
   user_is_playing: (name: string) => void
+  opponent_disconnected: (name: string) => void
 }
 
 
 export interface SocketData {
   name: string
   status: 'playing' | 'waiting'
+  roomName: string
 }
 
 export type BoardEntry = 'circle' | 'cross' | 'none' | 'winCircle' | 'winCross'

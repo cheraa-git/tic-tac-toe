@@ -1,11 +1,12 @@
 import { AppDispatch } from "../store"
 import { io } from "socket.io-client"
-import { clearAppState, setCurrentUser, setError, setOnlineUsers, setSocket } from "../slices/appSlices"
+import { clearAppState, setCurrentUser, setError, setLoading, setOnlineUsers, setSocket } from "../slices/appSlices"
 import { AppSocket } from "../../types"
 import { clearGameState, } from "../slices/gameSlices"
 import { gameEvents } from "./gameActions"
 
 export const connect = (name: string) => (dispatch: AppDispatch) => {
+  dispatch(setLoading(true))
   const socket: AppSocket = io(process.env.REACT_APP_SERVER_URL + '', { transports: ['websocket'] })
   socket.on('connect', () => {
     socket.emit('login', name)
@@ -14,12 +15,14 @@ export const connect = (name: string) => (dispatch: AppDispatch) => {
   })
   socket.on('disconnect', () => {
     dispatch(logout())
+    dispatch(setLoading(false))
     console.log('disconnect')
   })
   socket.on('connect_error', () => {
     socket.close()
     dispatch(logout())
     dispatch(setError('Connection error'))
+    dispatch(setLoading(false))
     console.log('connect_error')
   })
   dispatch(authEvents(socket))
@@ -38,6 +41,7 @@ export const authEvents = (socket: AppSocket) => (dispatch: AppDispatch) => {
 
   socket.on('login', (users, currentUser) => {
     console.log('LOGIN', currentUser, users)
+    dispatch(setLoading(false))
     dispatch(setOnlineUsers(users))
     dispatch(setCurrentUser(currentUser))
   })

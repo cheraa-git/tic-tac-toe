@@ -3,7 +3,7 @@ import { BoardData } from "../../../../common/common_types"
 import { AppSocket } from "../../types"
 import {
   setBoardData,
-  setGameData,
+  setGameData, setGameLoading,
   setIncomingInviteName,
   setInfoMessage,
   setResultGame,
@@ -26,6 +26,7 @@ export const gameEvents = (socket: AppSocket) => (dispatch: AppDispatch, getStat
   })
 
   socket.on('move', ({ boardData, result }) => {
+    dispatch(setGameLoading(false))
     dispatch(setBoardData(boardData))
     const moveAvailable = getState().game.moveAvailable
     if (result === 'win' && moveAvailable) {
@@ -36,6 +37,14 @@ export const gameEvents = (socket: AppSocket) => (dispatch: AppDispatch, getStat
       dispatch(setResultGame("draw"))
     } else if (result === 'next') {
       dispatch(toggleMove())
+    }
+  })
+
+  socket.on('opponent_disconnected', (name) => {
+    console.log('opponent_disconnected', getState().game.opponentName, name)
+    if (getState().game.opponentName === name) {
+      dispatch(setInfoMessage(`${name} disconnected. You won`))
+      dispatch(setResultGame("win"))
     }
   })
 }
@@ -61,5 +70,6 @@ export const doMove = (boardData: BoardData) => (dispatch: AppDispatch, getState
   const { roomName, shape } = getState().game
   if (shape && roomName && boardData && socket) {
     socket.emit('do_move', { boardData, shape, roomName })
+    dispatch(setGameLoading(true))
   }
 }
